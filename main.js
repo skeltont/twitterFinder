@@ -4,7 +4,6 @@ var fs = require('fs');
 
 var T = new Twit(helpers.return_config());
 /*
-
 // This is the real way to do it via docs at https://github.com/ttezel/twit
 // I've just hidden mine cuz I don't want none of y'all makin' weird posts for me.
 
@@ -14,37 +13,26 @@ var T = new Twit({
   , access_token:         '...'
   , access_token_secret:  '...'
 })
+
 */
 
 function assembleInitialHash(accounts, callback) {
   var followerHash = {};
-  var name = '';
   var count = 0;
-  // for (var key in accounts) {
-  for(var i = 0; i < accounts.length; i++) {
-    if (accounts.hasOwnProperty(i)) {
-      name = accounts[i];
-      console.log('name: ' + name);
-      T.get('followers/ids', { screen_name: name },  function (err, data, response) {
-        if (err || name === '') {
-        // if (err) {
-          console.log(name + ' resulted in a bad query: ');
-          console.log(err);
-          if (++count === accounts.length) {
-            console.log('not gucci');
-            callback(followerHash);
-          }
-        } else {
-          console.log('test');
-          followerHash[name] = data.id;
-          if (++count === accounts.length) {
-            console.log('gucci');
-            callback(followerHash);
-          }
-        }
-      });
-    }
-  }
+  var acc = accounts.slice(0);
+  (function retrieve() {
+    var account = acc.splice(0,1)[0];
+    T.get('followers/ids', { screen_name: account },  function (err, data, response) {
+      if (err) { console.log(err); }
+      if (acc.length === 0) {
+        callback(followerHash);
+      } else {
+        if (account.length > 0)
+          followerHash[account] = data.ids;
+        retrieve();
+      }
+    });
+  })();
 }
 
 function compare(followerHash, callback) {
@@ -65,7 +53,6 @@ function compare(followerHash, callback) {
       }
     }
   }
-  console.log('second');
   callback(potentialAccounts);
 }
 
@@ -77,7 +64,6 @@ function assembleFinalList(potentialAccounts, numUsableAccounts, callback) {
         finalAccounts.final.push(key);
     }
   }
-  console.log('third');
   callback(finalAccounts);
 }
 
@@ -103,10 +89,8 @@ function main() {
   }
 
   assembleInitialHash(accounts, function(followerHash) {
-    console.log('first');
     compare(followerHash, function(potentialAccounts) {
       numUsableAccounts = Object.keys(followerHash).length;
-      console.log(numUsableAccounts);
       assembleFinalList(potentialAccounts, numUsableAccounts, function(finalAccounts) {
         writeFinalResults(finalAccounts);
       });
