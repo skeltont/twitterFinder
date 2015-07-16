@@ -1,5 +1,5 @@
 # twitterFinder
-find someone's twitter based on who you heard they follow.<br>
+find someone's twitter based on who you heard they follow. nothing fancy.<br>
 SHOUTS OUT TO https://github.com/ttezel/twit, because I used their api. 
 
 ## Install
