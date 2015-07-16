@@ -24,7 +24,8 @@ then run:
 node main.js whatever.txt
 ```
 
-Your results will be in a file called 
+ids of accounts that all follow the users requested will be in a file called:
 ```
 twitterFinderResults.txt
 ```
+Then just look up the id(s)!
